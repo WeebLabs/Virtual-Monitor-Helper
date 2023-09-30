@@ -1,4 +1,4 @@
-# Virtual-Monitor-Helper
+# Virtual Monitor Helper
 A little system tray utility which ensures that Sunshine's configuration file is kept up to date with IddSampleDriver's display name and gracefully handles display configuration changes.
 
 When launched, it will determine the display ID currently associated with IddSampleDriver, write that value to the output_device field of Sunshine's configuration file
