@@ -1,5 +1,5 @@
 # Virtual Monitor Helper
-A little system tray utility for those who wish to use Sunshine and Moonlight in conjunction with IddSampleDriver as an external display.  It ensures that Sunshine's configuration file is kept up to date with IddSampleDriver's display name and gracefully handles display configuration changes.
+A little system tray utility for those who wish to use Sunshine and Moonlight in conjunction with IddSampleDriver as an external display.  It ensures that Sunshine's configuration file is kept up to date with IddSampleDriver's display name and gracefully handles Windows display configuration changes.
 
 When launched, it will determine the display ID currently associated with IddSampleDriver, write that value to the output_device field of Sunshine's configuration file
 and then restart the Sunshine service.  It will then listen continuously for Windows changes to Windows display configuration (resolution changes, connections, disconnects and so on).  
