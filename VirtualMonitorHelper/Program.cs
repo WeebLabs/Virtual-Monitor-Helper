@@ -119,13 +119,22 @@
                 string[] lines = File.ReadAllLines(configFilePath);
 
                 // Find and replace the "output_name =" line.
+                bool found = false;
                 for (int i = 0; i < lines.Length; i++)
                 {
                     if (lines[i].StartsWith("output_name ="))
                     {
                         lines[i] = "output_name = " + deviceName;
+                        found = true;
                         break;
                     }
+                }
+
+                if (!found)
+                {
+                    // If "output_name =" is not found, add it as a new line
+                    Array.Resize(ref lines, lines.Length + 1);
+                    lines[lines.Length - 1] = "output_name = " + deviceName;
                 }
 
                 // Write the modified content back to the config file.
