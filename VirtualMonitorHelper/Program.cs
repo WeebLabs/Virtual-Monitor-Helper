@@ -211,7 +211,7 @@
              if (GlobalVariables.currentDeviceName == GlobalVariables.previousDeviceName)
             {
                 Console.WriteLine("Display Name has not changed.  No need to run process.");
-                return
+                return;
             }
             
             Console.WriteLine("Display Name has changed!  Running process.");
