@@ -200,6 +200,7 @@
                 }
                 deviceIndex++;
             }
+
             if (foundDevice == false)
             {
                 Console.WriteLine($"{GlobalVariables.targetDeviceString} has been lost!  Restarting Sunshine service and waiting...");
@@ -207,25 +208,24 @@
                 return;
             }
             
-            if (GlobalVariables.currentDeviceName != GlobalVariables.previousDeviceName)
-            {
-                Console.WriteLine("Display Name has changed!  Running process.");
-                // Update the config file with the "Device Name."
-                UpdateConfigFileWithDeviceName(GlobalVariables.currentDeviceName);
-
-                // Set write permissions for "Everyone" on the config file.
-                SetFilePermissionsForEveryone();
-
-                // Restart the "SunshineService" Windows service.
-                RestartSunshineService();
-
-                //Record the current DisplayName for future comparison.
-                GlobalVariables.previousDeviceName = GlobalVariables.currentDeviceName;
-            }
-            else if (GlobalVariables.currentDeviceName == GlobalVariables.previousDeviceName)
+             if (GlobalVariables.currentDeviceName == GlobalVariables.previousDeviceName)
             {
                 Console.WriteLine("Display Name has not changed.  No need to run process.");
+                return
             }
+            
+            Console.WriteLine("Display Name has changed!  Running process.");
+            // Update the config file with the "Device Name."
+            UpdateConfigFileWithDeviceName(GlobalVariables.currentDeviceName);
+
+            // Set write permissions for "Everyone" on the config file.
+            SetFilePermissionsForEveryone();
+
+            // Restart the "SunshineService" Windows service.
+            RestartSunshineService();
+
+            //Record the current DisplayName for future comparison.
+            GlobalVariables.previousDeviceName = GlobalVariables.currentDeviceName;
         }
 
         private static void RestartSunshineService()
