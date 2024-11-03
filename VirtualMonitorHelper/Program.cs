@@ -34,6 +34,7 @@
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
             public static string previousDeviceName;
             public static string currentDeviceName;
+            public static string targetDeviceString = "IddSampleDriver Device";
         }
 
         static NotifyIcon notifyIcon;
@@ -61,7 +62,6 @@
             notifyIcon.Text = "Virtual Monitor Helper";
 
             // Your existing logic goes here...
-            string targetDeviceString = "IddSampleDriver Device";
             DISPLAY_DEVICE displayDevice = new DISPLAY_DEVICE();
             displayDevice.cb = (uint)Marshal.SizeOf(displayDevice);
             bool foundDevice = false;
@@ -69,7 +69,7 @@
             uint deviceIndex = 0;
             while (EnumDisplayDevices(null, deviceIndex, ref displayDevice, EDD_GET_DEVICE_INTERFACE_NAME))
             {
-                if (string.Equals(displayDevice.DeviceString, targetDeviceString, StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(displayDevice.DeviceString, GlobalVariables.targetDeviceString, StringComparison.OrdinalIgnoreCase))
                 {
                     Console.WriteLine($"Device String: {displayDevice.DeviceString}");
                     Console.WriteLine($"Associated Device Name: {displayDevice.DeviceName}");
@@ -92,7 +92,7 @@
             }
             if (foundDevice == false)
             {
-                Console.WriteLine($"Virtual display device ({targetDeviceString}) not found!");
+                Console.WriteLine($"Virtual display device ({GlobalVariables.targetDeviceString}) not found!");
             }
 
             SystemEvents.DisplaySettingsChanged += new
@@ -182,7 +182,6 @@
         {
             Console.WriteLine("The display settings changed.  Checking to see if Display Name is the same.");
 
-            string targetDeviceString = "IddSampleDriver Device";
             DISPLAY_DEVICE displayDevice = new DISPLAY_DEVICE();
             displayDevice.cb = (uint)Marshal.SizeOf(displayDevice);
             bool foundDevice = false;
@@ -190,7 +189,7 @@
             uint deviceIndex = 0;
             while (EnumDisplayDevices(null, deviceIndex, ref displayDevice, EDD_GET_DEVICE_INTERFACE_NAME))
             {
-                if (string.Equals(displayDevice.DeviceString, targetDeviceString, StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(displayDevice.DeviceString, GlobalVariables.targetDeviceString, StringComparison.OrdinalIgnoreCase))
                 {
                     Console.WriteLine($"New Device String: {displayDevice.DeviceString}");
                     Console.WriteLine($"New Associated Device Name: {displayDevice.DeviceName}");
@@ -201,34 +200,32 @@
                 }
                 deviceIndex++;
             }
+
             if (foundDevice == false)
             {
-                Console.WriteLine($"{targetDeviceString} has been lost!  Restarting Sunshine service and waiting...");
+                Console.WriteLine($"{GlobalVariables.targetDeviceString} has been lost!  Restarting Sunshine service and waiting...");
                 RestartSunshineService();
-
+                return;
             }
-            if (foundDevice == true)
+            
+             if (GlobalVariables.currentDeviceName == GlobalVariables.previousDeviceName)
             {
-                if (GlobalVariables.currentDeviceName != GlobalVariables.previousDeviceName)
-                {
-                    Console.WriteLine("Display Name has changed!  Running process.");
-                    // Update the config file with the "Device Name."
-                    UpdateConfigFileWithDeviceName(GlobalVariables.currentDeviceName);
-
-                    // Set write permissions for "Everyone" on the config file.
-                    SetFilePermissionsForEveryone();
-
-                    // Restart the "SunshineService" Windows service.
-                    RestartSunshineService();
-
-                    //Record the current DisplayName for future comparison.
-                    GlobalVariables.previousDeviceName = GlobalVariables.currentDeviceName;
-                }
-                else if (GlobalVariables.currentDeviceName == GlobalVariables.previousDeviceName)
-                {
-                    Console.WriteLine("Display Name has not changed.  No need to run process.");
-                }
+                Console.WriteLine("Display Name has not changed.  No need to run process.");
+                return;
             }
+            
+            Console.WriteLine("Display Name has changed!  Running process.");
+            // Update the config file with the "Device Name."
+            UpdateConfigFileWithDeviceName(GlobalVariables.currentDeviceName);
+
+            // Set write permissions for "Everyone" on the config file.
+            SetFilePermissionsForEveryone();
+
+            // Restart the "SunshineService" Windows service.
+            RestartSunshineService();
+
+            //Record the current DisplayName for future comparison.
+            GlobalVariables.previousDeviceName = GlobalVariables.currentDeviceName;
         }
 
         private static void RestartSunshineService()
